@@ -1,5 +1,3 @@
-package instant
-
 /*
 Package instant enables creation and publishing of Facebook Instant Articles.
 https://github.com/mileusna/facebook-instant-articles
@@ -56,3 +54,4 @@ Use instant.NewFeed() to create initial struct with all headers set up and
 use helper functions line AddArticles to add instant.Article to feed. Custom
 marshaler provides valid Facebook instant article RSS feed.
 */
+package instant
