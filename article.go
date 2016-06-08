@@ -198,30 +198,30 @@ func (ia *Article) headString() string {
 	return buff.String()
 }
 
-// SetTitle sets article title
-// Setting article title is mandatory
+// SetTitle sets article title.
+// Setting article title is mandatory.
 func (ia *Article) SetTitle(title string) {
 	ia.Body.Article.Header.H1 = title
 }
 
-// SetCanonical sets public web url for this article
-// Setting canonical link is required
+// SetCanonical sets public web url for this article.
+// Setting canonical link is required.
 func (ia *Article) SetCanonical(url string) {
 	ia.Head.Link.Rel = "canonical"
 	ia.Head.Link.Href = url
 }
 
-// SetLang sets two-chars language code for article
+// SetLang sets two-chars language code for article. Default is set to en.
 func (ia *Article) SetLang(lang string) {
 	ia.Lang = lang
 }
 
-// SetSubtitle sets article subtitle
+// SetSubtitle sets article subtitle.
 func (ia *Article) SetSubtitle(subtitle string) {
 	ia.Body.Article.Header.H2 = subtitle
 }
 
-// SetKick sets article kick text
+// SetKick sets article kick text.
 func (ia *Article) SetKick(kick string) {
 	ia.Body.Article.Header.H3 = h3{
 		Class: "op-kicker",
@@ -229,7 +229,7 @@ func (ia *Article) SetKick(kick string) {
 	}
 }
 
-// SetStyle sets user deifined style for this article
+// SetStyle set user deifined style for this article.
 func (ia *Article) SetStyle(style string) {
 	ia.Head.Meta = append(ia.Head.Meta, Meta{
 		Property: "fb:article_style",
@@ -248,13 +248,13 @@ func (ia *Article) SetText(text string) {
 	}
 }
 
-// AddParagraph add text paragraph to Instant Article
+// AddParagraph add text paragraph to Instant Article.
 func (ia *Article) AddParagraph(p string) {
 	ia.Body.Article.P = append(ia.Body.Article.P, p)
 }
 
-// AddAuthor adds article author
-// link and description can be empty strings ""
+// AddAuthor adds article author.
+// Link and description can be empty strings ""
 func (ia *Article) AddAuthor(name, link, description string) {
 	ia.Body.Article.Header.Address = append(ia.Body.Article.Header.Address, Address{
 		A:    a{Text: name, Href: link},

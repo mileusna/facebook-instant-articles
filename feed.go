@@ -14,7 +14,7 @@ type Feed struct {
 }
 
 type channel struct {
-	Title         string `xml:"title,cdata"`
+	Title         string `xml:"title"`
 	LastBuildDate string `xml:"lastBuildDate"`
 	Language      string `xml:"language"`
 	Link          string `xml:"link"`

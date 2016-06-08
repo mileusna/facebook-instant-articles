@@ -25,7 +25,7 @@ func TestFeed(t *testing.T) {
 	a.SetPublish(time.Now(), "02.01.2006") // 02.01.2006 is time.Parse format
 
 	a.SetFooter("", "(C)MyComp 2016")
-	a.AddAuthor("Michael", "writer", "Guest writter")
+	a.AddAuthor("Michael", "http://facebook.com/mmichael", "Guest writter")
 
 	a.SetText("Plain text\nPlain text\nPlain text")
 	a.AddParagraph("End")
