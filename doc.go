@@ -1,7 +1,7 @@
 package instant
 
 /*
-   Package Instant enables creation and publishing of Facebook Instant Articles.
+   Package instant enables creation and publishing of Facebook Instant Articles.
    https://github.com/mileusna/facebook-instant-articles
 
    Facebook instant articles documentation can be found here
