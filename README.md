@@ -1,9 +1,9 @@
-# facebook-instant-articles ![GoDoc](https://godoc.org/github.com/mileusna/facebook-instant-articles?status.png)
+# facebook-instant-articles [![GoDoc](https://godoc.org/github.com/mileusna/facebook-instant-articles?status.svg)](https://godoc.org/github.com/mileusna/facebook-instant-articles)
 
 Package Instant enables creation and publishing of Facebook Instant Articles.
 https://github.com/mileusna/facebook-instant-articles
 
-**Work in progress, things might change**
+**Work in progress, things might change!!!**
 
 Facebook instant articles documentation can be found here
 https://developers.facebook.com/docs/instant-articles
@@ -16,6 +16,8 @@ create instant article without setting struct properties directly. Custom
 marshaler provides Facebook instant article html.
 
 ```Go
+package main
+
 import (
 	"encoding/xml"
 	"time"
