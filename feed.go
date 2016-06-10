@@ -2,7 +2,9 @@ package instant
 
 import (
 	"bytes"
+	"crypto/md5"
 	"encoding/xml"
+	"fmt"
 	"time"
 )
 
@@ -59,12 +61,25 @@ func (f *Feed) SetLastBuildDate(d time.Time) {
 
 }
 
-// AddArticle to feed.
+// AddArticle to feed. Md5 checksum of URL will be used as GUID.
 func (f *Feed) AddArticle(a *Article) error {
+	return f.addArticle(a, "")
+}
+
+// AddArticleWithGUID to feed.
+func (f *Feed) AddArticleWithGUID(a *Article, guid string) error {
+	return f.addArticle(a, guid)
+}
+
+func (f *Feed) addArticle(a *Article, guid string) error {
 
 	b, err := xml.Marshal(a)
 	if err != nil {
 		return err
+	}
+
+	if guid == "" {
+		guid = fmt.Sprintf("%x", md5.Sum([]byte(a.Head.Link.Href)))
 	}
 
 	var buff bytes.Buffer
@@ -76,7 +91,7 @@ func (f *Feed) AddArticle(a *Article) error {
 		Title:       a.Body.Article.Header.H1,
 		Description: a.Body.Article.Header.H2,
 		Link:        a.Head.Link.Href,
-		GUID:        a.Head.Link.Href,
+		GUID:        guid,
 		Encoded:     buff.Bytes(),
 	}
 
