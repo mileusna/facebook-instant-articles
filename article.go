@@ -157,7 +157,7 @@ func (ia *Article) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	html.Head.S = ia.headString()
 
 	e.EncodeToken(xml.Directive("doctype html"))
-	e.EncodeToken(xml.CharData("\n"))
+	//e.EncodeToken(xml.CharData("\n"))
 
 	start.Name.Local = "html" // rename root element from Article to html
 	return e.EncodeElement(html, start)

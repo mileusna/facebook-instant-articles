@@ -1,7 +1,6 @@
 # facebook-instant-articles [![GoDoc](https://godoc.org/github.com/mileusna/facebook-instant-articles?status.svg)](https://godoc.org/github.com/mileusna/facebook-instant-articles)
 
 Package Instant enables creation and publishing of Facebook Instant Articles.
-https://github.com/mileusna/facebook-instant-articles
 
 **Work in progress, things might change!!!**
 
@@ -10,10 +9,10 @@ https://developers.facebook.com/docs/instant-articles
 
 Struct instant.Article represents Facebook instant article as described on
 https://developers.facebook.com/docs/instant-articles/guides/articlecreate
-Use instant.NewArticle() to creat initial struct with all headers set up and
-use helper functions line SetTitle(), SetCoverImage() to easily
+Use instant.NewArticle() to create initial struct with all headers set up and
+use helper functions like SetTitle(), SetCoverImage() to easily
 create instant article without setting struct properties directly. Custom
-marshaler provides Facebook instant article html.
+marshaler provides Facebook instant article valid html.
 
 ```Go
 package main
@@ -55,5 +54,5 @@ func main() {
 Struct instant.Feed represents Facebook instant article RSS feed as described on
 https://developers.facebook.com/docs/instant-articles/publishing/setup-rss-feed
 Use instant.NewFeed() to create initial struct with all headers set up and
-use helper functions line AddArticles to add instant.Article to feed. Custom
+use helper functions like AddArticles to add instant.Article to feed. Custom
 marshaler provides valid Facebook instant article RSS feed.
