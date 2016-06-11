@@ -3,6 +3,7 @@ package instant
 import (
 	"bytes"
 	"encoding/xml"
+	"errors"
 	"strings"
 	"time"
 )
@@ -40,7 +41,7 @@ type Header struct {
 	H1      string    `xml:"h1"`
 	Time    []Time    `xml:"time"`
 	H2      string    `xml:"h2,omitempty"`
-	H3      h3        `xml:"h3,omitempty"`
+	H3      *h3       `xml:"h3,omitempty"`
 	Address []Address `xml:"address,omitempty"`
 	Figure  *Figure   `xml:"figure,omitempty"`
 }
@@ -142,6 +143,14 @@ func NewArticle() *Article {
 // MarshalXML for xml.Marshaler interface, marshal Article struct to Facebook Instant Article format.
 func (ia *Article) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
+	// check required fields
+	if ia.Body.Article.Header.H1 == "" {
+		return errors.New("Article title <h1> is required")
+	}
+	if ia.Head.Link.Href == "" {
+		return errors.New("Canonical link is required")
+	}
+
 	html := struct {
 		Prefix string `xml:"prefix,attr"`
 		Lang   string `xml:"lang,attr"`
@@ -156,10 +165,8 @@ func (ia *Article) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	html.Prefix = ia.Prefix
 	html.Head.S = ia.headString()
 
-	e.EncodeToken(xml.Directive("doctype html"))
-	//e.EncodeToken(xml.CharData("\n"))
-
 	start.Name.Local = "html" // rename root element from Article to html
+	e.EncodeToken(xml.Directive("doctype html"))
 	return e.EncodeElement(html, start)
 }
 
@@ -223,7 +230,7 @@ func (ia *Article) SetSubtitle(subtitle string) {
 
 // SetKick sets article kick text.
 func (ia *Article) SetKick(kick string) {
-	ia.Body.Article.Header.H3 = h3{
+	ia.Body.Article.Header.H3 = &h3{
 		Class: "op-kicker",
 		Text:  kick,
 	}
@@ -288,9 +295,11 @@ func (ia *Article) SetModified(date time.Time, format string) {
 // Caption can be empty string.
 func (ia *Article) SetCoverImage(url, caption string) {
 	// override if cover video has been set
-	ia.Body.Article.Header.Figure = &Figure{
-		Img:        &Img{Src: url},
-		Figcaption: caption,
+	if url != "" {
+		ia.Body.Article.Header.Figure = &Figure{
+			Img:        &Img{Src: url},
+			Figcaption: caption,
+		}
 	}
 }
 
@@ -299,14 +308,16 @@ func (ia *Article) SetCoverImage(url, caption string) {
 // Caption can be empty string.
 func (ia *Article) SetCoverVideo(url, videoType, caption string) {
 	// override cover image if set
-	ia.Body.Article.Header.Figure = &Figure{
-		Video: &Video{
-			Source: source{
-				Src:  url,
-				Type: videoType,
+	if url != "" {
+		ia.Body.Article.Header.Figure = &Figure{
+			Video: &Video{
+				Source: source{
+					Src:  url,
+					Type: videoType,
+				},
 			},
-		},
-		Figcaption: caption,
+			Figcaption: caption,
+		}
 	}
 }
 
