@@ -33,15 +33,14 @@ func main() {
 
 	// optional
 	a.SetSubtitle("My article subtitle")
-	a.SetKick("Set article kick")
+	a.SetKick("Exclusive")
 
 	a.SetPublish(time.Now(), "02.01.2006") // 02.01.2006 is time.Parse format
 
-	a.SetFooter("", "(C)MyComp 2016")
+	a.SetFooter("", "(C)2016 MyComp")
 	a.AddAuthor("Michael", "http://facebook.com/mmichael", "Guest writter")
 
-	a.SetText("Plain text\nPlain text\nPlain text")
-	a.AddParagraph("End")
+	a.SetContent("<p>My content</p><p>Other paragraph</p>")
 
 	html, err := xml.Marshal(a)
 	if err != nil {

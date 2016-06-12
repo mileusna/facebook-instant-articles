@@ -34,8 +34,6 @@ type item struct {
 	Encoded     []byte   `xml:",innerxml"`
 }
 
-type encoded []byte
-
 // NewFeed bb
 func NewFeed(title, link, description string) *Feed {
 	f := &Feed{
@@ -57,7 +55,7 @@ func (f *Feed) SetLanguage(l string) {
 }
 
 // SetLastBuildDate sets feed last build date.
-func (f *Feed) SetLastBuildDate(d time.Time) {
+func (f *Feed) setLastBuildDate(d time.Time) {
 
 }
 
@@ -96,9 +94,9 @@ func (f *Feed) addArticle(a *Article, guid string) error {
 	}
 
 	// if no subtitle, set first para as description
-	if i.Description == "" && len(a.Body.Article.P) != 0 {
-		i.Description = a.Body.Article.P[0]
-	}
+	// if i.Description == "" && len(a.Body.Article.P) != 0 {
+	// 	i.Description = a.Body.Article.P[0]
+	// }
 
 	// set latest article date as pubDate
 	for _, d := range a.Body.Article.Header.Time {

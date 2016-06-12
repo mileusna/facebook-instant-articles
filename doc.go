@@ -37,8 +37,7 @@ Example:
         a.SetFooter("", "(C)MyComp 2016")
         a.AddAuthor("Michael", "http://facebook.com/mmichael", "Guest writter")
 
-        a.SetText("Plain text\nPlain text\nPlain text")
-        a.AddParagraph("End")
+        a.SetContent("<p>my content</p><p>Use Paragraphs</p>")
 
         html, err := xml.Marshal(a)
         if err != nil {
