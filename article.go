@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	regexContent = regexp.MustCompile("((?:<p>|<figure[^>]*>).*(?:</p>|</figure>))")
+	regexContent = regexp.MustCompile("((?:<p>|<figure[^>]*>).*?(?:</p>|</figure>))")
 )
 
 // Article struct
