@@ -94,9 +94,14 @@ func (f *Feed) addArticle(a *Article, guid string) error {
 	}
 
 	// if no subtitle, set first para as description
-	// if i.Description == "" && len(a.Body.Article.P) != 0 {
-	// 	i.Description = a.Body.Article.P[0]
-	// }
+	if i.Description == "" && a.Body.Article.Elements != nil {
+		for _, e := range a.Body.Article.Elements {
+			if e.P != "" {
+				i.Description = e.P
+				break
+			}
+		}
+	}
 
 	// set latest article date as pubDate
 	for _, d := range a.Body.Article.Header.Time {
