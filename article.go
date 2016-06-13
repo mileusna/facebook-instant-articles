@@ -50,7 +50,7 @@ type header struct {
 	H2      string    `xml:"h2,omitempty"`
 	H3      *h3       `xml:"h3,omitempty"`
 	Address []address `xml:"address,omitempty"`
-	Figure  *Figure   `xml:"figure,omitempty"`
+	Figure  []*Figure `xml:"figure,omitempty"`
 }
 
 // Footer represents instant article footer
@@ -339,10 +339,10 @@ func (ia *Article) SetModified(date time.Time, format string) {
 func (ia *Article) SetCoverImage(url, caption string) {
 	// override if cover video has been set
 	if url != "" {
-		ia.Body.Article.Header.Figure = &Figure{
+		ia.Body.Article.Header.Figure = append(ia.Body.Article.Header.Figure, &Figure{
 			Img:        &Img{Src: url},
 			Figcaption: caption,
-		}
+		})
 	}
 }
 
@@ -352,7 +352,7 @@ func (ia *Article) SetCoverImage(url, caption string) {
 func (ia *Article) SetCoverVideo(url, videoType, caption string) {
 	// override cover image if set
 	if url != "" {
-		ia.Body.Article.Header.Figure = &Figure{
+		ia.Body.Article.Header.Figure = append(ia.Body.Article.Header.Figure, &Figure{
 			Video: &Video{
 				Source: source{
 					Src:  url,
@@ -360,7 +360,7 @@ func (ia *Article) SetCoverVideo(url, videoType, caption string) {
 				},
 			},
 			Figcaption: caption,
-		}
+		})
 	}
 }
 
@@ -406,7 +406,7 @@ func (ia *Article) switchAutomaticAd(on bool) {
 // SetAutomaticAd in header that Facebook will place automatically in article
 func (ia *Article) SetAutomaticAd(src string, width, height int, style, code string) {
 	f := adFigure(src, width, height, style, code)
-	ia.Body.Article.Header.Figure = f
+	ia.Body.Article.Header.Figure = append(ia.Body.Article.Header.Figure, f)
 	ia.switchAutomaticAd(true)
 }
 
