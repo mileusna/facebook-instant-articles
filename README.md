@@ -24,23 +24,19 @@ import (
 )
 
 func main() {
-
 	a := instant.NewArticle()
 
-	// mandatory
+	// required
 	a.SetTitle("My article title")
 	a.SetCanonical("http://mysite/url-to-this-article")
+	a.SetPublish(time.Now())
+	a.SetContent("<p>My content</p><p>Other paragraph</p>")
 
 	// optional
 	a.SetSubtitle("My article subtitle")
 	a.SetKick("Exclusive")
-
-	a.SetPublish(time.Now(), "02.01.2006") // 02.01.2006 is time.Parse format
-
 	a.SetFooter("", "(C)2016 MyComp")
 	a.AddAuthor("Michael", "http://facebook.com/mmichael", "Guest writter")
-
-	a.SetContent("<p>My content</p><p>Other paragraph</p>")
 
 	html, err := xml.Marshal(a)
 	if err != nil {

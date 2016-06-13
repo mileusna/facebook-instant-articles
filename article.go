@@ -313,24 +313,22 @@ func (ia *Article) AddAuthor(name, link, description string) {
 }
 
 // SetPublish sets published date.
-// Use time.Parse() format for formatting user readable date.
-func (ia *Article) SetPublish(date time.Time, format string) {
+func (ia *Article) SetPublish(date time.Time) {
 	// <time class="op-published" datetime="2014-11-11T04:44:16Z">November 11th, 4:44 PM</time>
 	ia.Body.Article.Header.Time = append(ia.Body.Article.Header.Time, Time{
 		Class:    "op-published",
 		Datetime: date.Format("2006-01-02T15:04:05Z"),
-		Text:     date.Format(format),
+		Text:     date.Format("2006-01-02 15:04:05"),
 	})
 }
 
 // SetModified sets modified date if article has been modified.
-// Use time.Parse() format for formatting user readable date.
-func (ia *Article) SetModified(date time.Time, format string) {
+func (ia *Article) SetModified(date time.Time) {
 	// <time class="op-modified" dateTime="2014-12-11T04:44:16Z">December 11th, 4:44 PM</time>
 	ia.Body.Article.Header.Time = append(ia.Body.Article.Header.Time, Time{
 		Class:    "op-modified",
 		Datetime: date.Format("2006-01-02T15:04:05Z"),
-		Text:     date.Format(format),
+		Text:     date.Format("2006-01-02 15:04:05"),
 	})
 }
 
