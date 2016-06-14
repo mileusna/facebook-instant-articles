@@ -60,16 +60,16 @@ func (f *Feed) setLastBuildDate(d time.Time) {
 }
 
 // AddArticle to feed. Md5 checksum of URL will be used as GUID.
-func (f *Feed) AddArticle(a *Article) error {
+func (f *Feed) AddArticle(a Article) error {
 	return f.addArticle(a, "")
 }
 
 // AddArticleWithGUID to feed.
-func (f *Feed) AddArticleWithGUID(a *Article, guid string) error {
+func (f *Feed) AddArticleWithGUID(a Article, guid string) error {
 	return f.addArticle(a, guid)
 }
 
-func (f *Feed) addArticle(a *Article, guid string) error {
+func (f *Feed) addArticle(a Article, guid string) error {
 
 	b, err := xml.Marshal(a)
 	if err != nil {

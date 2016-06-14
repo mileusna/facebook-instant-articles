@@ -12,7 +12,7 @@ func TestFeed(t *testing.T) {
 
 	f := instant.NewFeed("My site title", "http://mysite.com", "News from all around the world")
 
-	a := instant.NewArticle()
+	a := instant.Article{}
 
 	// mandatory
 	a.SetTitle("My article title")

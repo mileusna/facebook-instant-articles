@@ -11,7 +11,7 @@ import (
 
 func TestArticle(t *testing.T) {
 
-	a := instant.NewArticle()
+	a := instant.Article{}
 
 	// required
 	a.SetTitle("My article title")

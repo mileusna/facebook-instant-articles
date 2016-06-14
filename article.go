@@ -133,28 +133,8 @@ type Img struct {
 	Src string `xml:"src,attr"`
 }
 
-// NewArticle creates instant article with mandatory headers all set up
-func NewArticle() *Article {
-	a := &Article{
-		Prefix: "op: http://media.facebook.com/op#",
-		Lang:   "en",
-		Head: head{
-			Meta: []Meta{
-				Meta{
-					Charset: "utf-8",
-				},
-				Meta{
-					Property: "op:markup_version",
-					Content:  "v1.0",
-				},
-			},
-		},
-	}
-	return a
-}
-
 // MarshalXML for xml.Marshaler interface, marshal Article struct to Facebook Instant Article format.
-func (ia *Article) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+func (ia Article) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	// check required fields
 	if ia.Body.Article.Header.H1 == "" {
 		return errors.New("Article title <h1> is required")
@@ -175,8 +155,12 @@ func (ia *Article) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	}{}
 
 	html.Body.Article = ia.Body.Article
-	html.Lang = ia.Lang
-	html.Prefix = ia.Prefix
+	if ia.Lang != "" {
+		html.Lang = ia.Lang
+	} else {
+		html.Lang = "en"
+	}
+	html.Prefix = "op: http://media.facebook.com/op#"
 	html.Head.S = ia.headString()
 
 	start.Name.Local = "html" // rename root element from Article to html
@@ -206,24 +190,29 @@ func (ia *Article) headString() string {
 	var buff bytes.Buffer
 
 	// link element
-	buff.WriteString("<link href=\"")
+	buff.WriteString("\n<link href=\"")
 	buff.WriteString(ia.Head.Link.Href)
 	buff.WriteString("\" rel=\"")
 	buff.WriteString(ia.Head.Link.Rel)
 	buff.WriteString("\" />")
 
 	// meta elements
+	var charset, markupVersion bool
 	for _, m := range ia.Head.Meta {
-		buff.WriteString("<meta ")
+		buff.WriteString("\n<meta ")
 		if m.Charset != "" {
 			buff.WriteString("charset=\"")
 			buff.WriteString(m.Charset)
 			buff.WriteString("\" ")
+			charset = true
 		}
 		if m.Property != "" {
 			buff.WriteString("property=\"")
 			buff.WriteString(m.Property)
 			buff.WriteString("\" ")
+			if m.Property == "op:markup_version" {
+				markupVersion = true
+			}
 		}
 		if m.Content != "" {
 			buff.WriteString("content=\"")
@@ -232,6 +221,15 @@ func (ia *Article) headString() string {
 		}
 		buff.WriteString("/>")
 	}
+
+	// write default meta elements if not set in meta tags
+	if !charset {
+		buff.WriteString("\n<meta charset=\"utf-8\" />")
+	}
+	if !markupVersion {
+		buff.WriteString("\n<meta property=\"op:markup_version\" content=\"v1.0\" />")
+	}
+
 	return buff.String()
 }
 

@@ -6,10 +6,10 @@ https://developers.facebook.com/docs/instant-articles
 
 Struct instant.Article represents Facebook instant article as described on
 https://developers.facebook.com/docs/instant-articles/guides/articlecreate
-Use instant.NewArticle() to create initial struct with all headers set up and
-use helper functions like SetTitle(), SetCoverImage() to easily
-create instant article without setting struct properties directly. Custom
-marshaler provides Facebook instant article valid html.
+Use instant.Article and then use helper functions like SetTitle(), SetCoverImage() etc.
+to easily create instant article without setting struct properties directly. Elemenets are
+nested in inner struct, so using setter functions is much easier. Custom marshaler will generate
+Facebook instant article valid html.
 
 Example:
     package main
@@ -21,7 +21,7 @@ Example:
     )
 
     func main() {
-        a := instant.NewArticle()
+        a := instant.Article{}
 
         // required
         a.SetTitle("My article title")
