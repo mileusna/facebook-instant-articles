@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	regexContent = regexp.MustCompile("((?:<p>|<figure[^>]*>).*?(?:</p>|</figure>))")
+	matchContent = regexp.MustCompile("((?:<p>|<figure[^>]*>).*?(?:</p>|</figure>))")
 )
 
 // Article struct
@@ -104,12 +104,12 @@ type Meta struct {
 
 // Address struct is a plaseholder for article author
 type address struct {
-	A    a      `xml:"a"`
+	A    alink  `xml:"a"`
 	Text string `xml:",chardata"`
 }
 
 // a link for Address struct
-type a struct {
+type alink struct {
 	Rel  string `xml:"rel,attr,omitempty"`
 	Href string `xml:"href,attr,omitempty"`
 	Text string `xml:",chardata"`
@@ -264,7 +264,8 @@ func (ia *Article) SetKick(kick string) {
 	}
 }
 
-// SetStyle set user deifined style for this article. See https://developers.facebook.com/docs/instant-articles/guides/design#style for more info.
+// SetStyle set user defined style for this article.
+// See https://developers.facebook.com/docs/instant-articles/guides/design#style for more info.
 func (ia *Article) SetStyle(style string) {
 	ia.Head.Meta = append(ia.Head.Meta, Meta{
 		Property: "fb:article_style",
@@ -274,11 +275,10 @@ func (ia *Article) SetStyle(style string) {
 
 // SetContent of instant article.
 // All html should be in <p> ... </p> elements. If no <p> elements found, entire HTML param will be added as one paragraph.
-// Images and videoos can be added later using InsertFigure() but <figure> can also be in HTML param if formated properly.
+// Images and videos can be added later using InsertFigure() but they can also be contained in HTML param if formated properly.
 // See https://developers.facebook.com/docs/instant-articles/reference for more info.
 func (ia *Article) SetContent(html string) {
-	matches := regexContent.FindAllString(html, -1)
-	if matches != nil {
+	if matches := matchContent.FindAllString(html, -1); matches != nil {
 		for _, m := range matches {
 			switch {
 			case strings.HasPrefix(m, "<p"):
@@ -296,16 +296,16 @@ func (ia *Article) SetContent(html string) {
 	}
 }
 
-// AddParagraph add text paragraph to Instant Article.
+// AddParagraph to Instant Article.
 func (ia *Article) AddParagraph(html string) {
 	ia.Body.Article.Elements = append(ia.Body.Article.Elements, element{P: html})
 }
 
 // AddAuthor adds article author.
-// Link and description can be empty strings ""
+// Link and description are optional (use "")
 func (ia *Article) AddAuthor(name, link, description string) {
 	ia.Body.Article.Header.Address = append(ia.Body.Article.Header.Address, address{
-		A:    a{Text: name, Href: link},
+		A:    alink{Text: name, Href: link},
 		Text: description,
 	})
 }
@@ -330,10 +330,9 @@ func (ia *Article) SetModified(date time.Time) {
 	})
 }
 
-// SetCoverImage sets image url and image caption.
+// SetCoverImage of instant article.
 // Caption can be empty string.
 func (ia *Article) SetCoverImage(url, caption string) {
-	// override if cover video has been set
 	if url != "" {
 		ia.Body.Article.Header.Figure = append(ia.Body.Article.Header.Figure, &Figure{
 			Img:        &Img{Src: url},
@@ -342,11 +341,10 @@ func (ia *Article) SetCoverImage(url, caption string) {
 	}
 }
 
-// SetCoverVideo sets cover video.
+// SetCoverVideo of instant article.
 // videoType in format video/mp4 See the list of supported formats here https://www.facebook.com/help/218673814818907
 // Caption can be empty string.
 func (ia *Article) SetCoverVideo(url, videoType, caption string) {
-	// override cover image if set
 	if url != "" {
 		ia.Body.Article.Header.Figure = append(ia.Body.Article.Header.Figure, &Figure{
 			Video: &Video{
@@ -369,11 +367,11 @@ func (ia *Article) SetFooter(credits, copyright string) {
 
 // SetTrackerCode for 3rd party analytics (Google Analytics for example)
 // Visit https://developers.facebook.com/docs/instant-articles/reference/analytics for more info.
-func (ia *Article) SetTrackerCode(html string) {
+func (ia *Article) SetTrackerCode(code string) {
 	f := &Figure{
 		Class: "op-tracker",
 		IFrame: &IFrame{
-			Text: html,
+			Text: code,
 		},
 	}
 	ia.Body.Article.Elements = append(ia.Body.Article.Elements, element{Figure: f})
@@ -446,9 +444,3 @@ func adFigure(src string, width, height int, style, code string) *Figure {
 		},
 	}
 }
-
-// 	ia.Body.Article
-// 	<figure class="op-ad">
-//   <iframe width="320" height="50" style="border:0; margin:0;" src="https://www.facebook.com/adnw_request?placement=141956036215488_141956099548815&adtype=banner320x50"></iframe>
-// </figure>
-// }
