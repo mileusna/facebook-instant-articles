@@ -33,6 +33,7 @@ func main() {
 	a.SetContent("<p>My content</p><p>Other paragraph</p>")
 
 	// optional
+	a.SetLang("fr") // default is en
 	a.SetSubtitle("My article subtitle")
 	a.SetKick("Exclusive")
 	a.SetFooter("", "(C)2016 MyComp")

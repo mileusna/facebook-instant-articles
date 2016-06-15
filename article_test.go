@@ -20,8 +20,9 @@ func TestArticle(t *testing.T) {
 	// optional
 	a.SetSubtitle("My article subtitle")
 	a.SetKick("Exclusive!")
+	a.SetLang("fr") // default is en
 
-	a.SetPublish(time.Now()) // 02.01.2006 is time.Parse format
+	a.SetPublish(time.Now())
 
 	a.SetFooter("", "©MyComp 2016")
 	a.AddAuthor("Michael", "http://facebook.com/mmichael", "Guest writter")

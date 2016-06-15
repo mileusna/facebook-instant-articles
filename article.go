@@ -264,7 +264,7 @@ func (ia *Article) SetKick(kick string) {
 	}
 }
 
-// SetStyle set user deifined style for this article.
+// SetStyle set user deifined style for this article. See https://developers.facebook.com/docs/instant-articles/guides/design#style for more info.
 func (ia *Article) SetStyle(style string) {
 	ia.Head.Meta = append(ia.Head.Meta, Meta{
 		Property: "fb:article_style",
@@ -272,10 +272,10 @@ func (ia *Article) SetStyle(style string) {
 	})
 }
 
-// SetContent sets Instant article content.
-// All html should be in <p> ... </p> elements. If no <p> elements found, entire HTML will be added as one and only paragraph.
-// Images and videoos can be added later using InsertFigure() but <figure> can also be in html
-// See more https://developers.facebook.com/docs/instant-articles/reference
+// SetContent of instant article.
+// All html should be in <p> ... </p> elements. If no <p> elements found, entire HTML param will be added as one paragraph.
+// Images and videoos can be added later using InsertFigure() but <figure> can also be in HTML param if formated properly.
+// See https://developers.facebook.com/docs/instant-articles/reference for more info.
 func (ia *Article) SetContent(html string) {
 	matches := regexContent.FindAllString(html, -1)
 	if matches != nil {
