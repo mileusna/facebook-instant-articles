@@ -5,10 +5,10 @@ import (
 	"crypto/md5"
 	"encoding/xml"
 	"fmt"
-	"time"
 )
 
-// Feed struct represents Facebook Instant Articles RSS feed
+// Feed struct represents Facebook Instant Articles RSS feed.
+// See https://developers.facebook.com/docs/instant-articles/publishing/setup-rss-feed for more info.
 type Feed struct {
 	Version string  `xml:"version,attr"`
 	Content string  `xml:"xmlns:content,attr"`
@@ -34,19 +34,19 @@ type item struct {
 	Encoded     []byte   `xml:",innerxml"`
 }
 
-// NewFeed bb
-func NewFeed(title, link, description string) *Feed {
-	f := &Feed{
-		Version: "2.0",
-		Content: "http://purl.org/rss/1.0/modules/content/",
-		Channel: channel{
-			Title:       title,
-			Link:        link,
-			Description: description,
-			Language:    "en-us",
-		},
-	}
-	return f
+// SetTitle of feed. Optional.
+func (f *Feed) SetTitle(s string) {
+	f.Channel.Title = s
+}
+
+// SetLink for feed. Optional.
+func (f *Feed) SetLink(url string) {
+	f.Channel.Link = url
+}
+
+// SetDescription set feed description. Optional.
+func (f *Feed) SetDescription(s string) {
+	f.Channel.Description = s
 }
 
 // SetLanguage sets feed language, default is set to en-us.
@@ -54,10 +54,9 @@ func (f *Feed) SetLanguage(l string) {
 	f.Channel.Language = l
 }
 
-// SetLastBuildDate sets feed last build date.
-func (f *Feed) setLastBuildDate(d time.Time) {
-
-}
+// // SetLastBuildDate sets feed last build date.
+// func (f *Feed) setLastBuildDate(d time.Time) {
+// }
 
 // AddArticle to feed. Md5 checksum of URL will be used as GUID.
 func (f *Feed) AddArticle(a Article) error {
@@ -125,8 +124,7 @@ func (f *Feed) addArticle(a Article, guid string) error {
 }
 
 // MarshalXML for xml.Marshaler interface
-func (f *Feed) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-
+func (f Feed) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	feed := struct {
 		Version string  `xml:"version,attr"`
 		Content string  `xml:"xmlns:content,attr"`
@@ -135,6 +133,12 @@ func (f *Feed) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		Version: f.Version,
 		Content: f.Content,
 		Channel: f.Channel,
+	}
+
+	feed.Version = "2.0"
+	feed.Content = "http://purl.org/rss/1.0/modules/content/"
+	if feed.Channel.Language == "" {
+		feed.Channel.Language = "en-us"
 	}
 
 	start.Name.Local = "rss" // rename root element from Article to html
