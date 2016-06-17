@@ -1,11 +1,6 @@
-# Facebook Instant Articles Go package [![GoDoc](https://godoc.org/github.com/mileusna/facebook-instant-articles?status.svg)](https://godoc.org/github.com/mileusna/facebook-instant-articles)
+# Facebook Instant Articles for Go [![GoDoc](https://godoc.org/github.com/mileusna/facebook-instant-articles?status.svg)](https://godoc.org/github.com/mileusna/facebook-instant-articles)
 
-Package Instant enables creation and publishing of Facebook Instant Articles.
-
-**Work in progress, things might change**
-
-Facebook instant articles documentation can be found here
-https://developers.facebook.com/docs/instant-articles
+Package Instant enables creation and publishing of Facebook Instant Articles https://developers.facebook.com/docs/instant-articles
 
 ## Article
 
@@ -46,7 +41,6 @@ func main() {
 	if err != nil {
 		return
 	}
-	
     // html contains Facebook instant article html as []byte
 }
 ```
@@ -104,6 +98,10 @@ func handleInstantArticles(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-###License
+##Documentation
 
-MIT
+https://godoc.org/github.com/mileusna/facebook-instant-articles
+
+##License
+
+[MIT](LICENSE)
