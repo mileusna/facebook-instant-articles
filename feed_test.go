@@ -26,9 +26,8 @@ func TestFeed(t *testing.T) {
 	f.AddArticle(a)
 	f.AddArticleWithGUID(a, "12333") // add article and use for example mysql id as GUID
 
-	feed, err := xml.Marshal(f)
+	_, err := xml.Marshal(f)
 	if err != nil {
 		t.Error(err)
 	}
-
 }

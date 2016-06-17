@@ -134,12 +134,12 @@ type Img struct {
 }
 
 // MarshalXML for xml.Marshaler interface, marshal Article struct to Facebook Instant Article format.
-func (ia Article) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+func (a Article) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	// check required fields
-	if ia.Body.Article.Header.H1 == "" {
+	if a.Body.Article.Header.H1 == "" {
 		return errors.New("Article title <h1> is required")
 	}
-	if ia.Head.Link.Href == "" {
+	if a.Head.Link.Href == "" {
 		return errors.New("Canonical link is required")
 	}
 
@@ -154,14 +154,14 @@ func (ia Article) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		} `xml:"body"`
 	}{}
 
-	html.Body.Article = ia.Body.Article
-	if ia.Lang != "" {
-		html.Lang = ia.Lang
+	html.Body.Article = a.Body.Article
+	if a.Lang != "" {
+		html.Lang = a.Lang
 	} else {
 		html.Lang = "en"
 	}
 	html.Prefix = "op: http://media.facebook.com/op#"
-	html.Head.S = ia.headString()
+	html.Head.S = a.headString()
 
 	start.Name.Local = "html" // rename root element from Article to html
 	e.EncodeToken(xml.Directive("doctype html"))
@@ -186,19 +186,19 @@ func (el *element) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 // headString returns instant article head section with self-closing <meta/> and <link/> tags.
 // xml.Marshal by default doesn't produce self-closing tags
-func (ia *Article) headString() string {
+func (a *Article) headString() string {
 	var buff bytes.Buffer
 
 	// link element
 	buff.WriteString("\n<link href=\"")
-	buff.WriteString(ia.Head.Link.Href)
+	buff.WriteString(a.Head.Link.Href)
 	buff.WriteString("\" rel=\"")
-	buff.WriteString(ia.Head.Link.Rel)
+	buff.WriteString(a.Head.Link.Rel)
 	buff.WriteString("\" />")
 
 	// meta elements
 	var charset, markupVersion bool
-	for _, m := range ia.Head.Meta {
+	for _, m := range a.Head.Meta {
 		buff.WriteString("\n<meta ")
 		if m.Charset != "" {
 			buff.WriteString("charset=\"")
@@ -235,30 +235,30 @@ func (ia *Article) headString() string {
 
 // SetTitle sets article title.
 // Setting article title is mandatory.
-func (ia *Article) SetTitle(title string) {
-	ia.Body.Article.Header.H1 = title
+func (a *Article) SetTitle(title string) {
+	a.Body.Article.Header.H1 = title
 }
 
 // SetCanonical sets public web url for this article.
 // Setting canonical link is required.
-func (ia *Article) SetCanonical(url string) {
-	ia.Head.Link.Rel = "canonical"
-	ia.Head.Link.Href = url
+func (a *Article) SetCanonical(url string) {
+	a.Head.Link.Rel = "canonical"
+	a.Head.Link.Href = url
 }
 
 // SetLang sets two-chars language code for article. Default is set to en.
-func (ia *Article) SetLang(lang string) {
-	ia.Lang = lang
+func (a *Article) SetLang(lang string) {
+	a.Lang = lang
 }
 
 // SetSubtitle sets article subtitle.
-func (ia *Article) SetSubtitle(subtitle string) {
-	ia.Body.Article.Header.H2 = subtitle
+func (a *Article) SetSubtitle(subtitle string) {
+	a.Body.Article.Header.H2 = subtitle
 }
 
 // SetKick sets article kick text.
-func (ia *Article) SetKick(kick string) {
-	ia.Body.Article.Header.H3 = &h3{
+func (a *Article) SetKick(kick string) {
+	a.Body.Article.Header.H3 = &h3{
 		Class: "op-kicker",
 		Text:  kick,
 	}
@@ -266,8 +266,8 @@ func (ia *Article) SetKick(kick string) {
 
 // SetStyle set user defined style for this article.
 // See https://developers.facebook.com/docs/instant-articles/guides/design#style for more info.
-func (ia *Article) SetStyle(style string) {
-	ia.Head.Meta = append(ia.Head.Meta, Meta{
+func (a *Article) SetStyle(style string) {
+	a.Head.Meta = append(a.Head.Meta, Meta{
 		Property: "fb:article_style",
 		Content:  style,
 	})
@@ -277,43 +277,43 @@ func (ia *Article) SetStyle(style string) {
 // All html should be in <p> ... </p> elements. If no <p> elements found, entire HTML param will be added as one paragraph.
 // Images and videos can be added later using InsertFigure() but they can also be contained in HTML param if formated properly.
 // See https://developers.facebook.com/docs/instant-articles/reference for more info.
-func (ia *Article) SetContent(html string) {
+func (a *Article) SetContent(html string) {
 	if matches := matchContent.FindAllString(html, -1); matches != nil {
 		for _, m := range matches {
 			switch {
 			case strings.HasPrefix(m, "<p"):
 				m = strings.TrimPrefix(m, "<p>")
 				m = strings.TrimSuffix(m, "</p>")
-				ia.AddParagraph(m)
+				a.AddParagraph(m)
 			case strings.HasPrefix(m, "<figure"):
 				f := &Figure{}
 				xml.Unmarshal([]byte(m), f)
-				ia.AddFigure(f)
+				a.AddFigure(f)
 			}
 		}
 	} else {
-		ia.AddParagraph(html)
+		a.AddParagraph(html)
 	}
 }
 
 // AddParagraph to Instant Article.
-func (ia *Article) AddParagraph(html string) {
-	ia.Body.Article.Elements = append(ia.Body.Article.Elements, element{P: html})
+func (a *Article) AddParagraph(html string) {
+	a.Body.Article.Elements = append(a.Body.Article.Elements, element{P: html})
 }
 
 // AddAuthor adds article author.
 // Link and description are optional (use "")
-func (ia *Article) AddAuthor(name, link, description string) {
-	ia.Body.Article.Header.Address = append(ia.Body.Article.Header.Address, address{
+func (a *Article) AddAuthor(name, link, description string) {
+	a.Body.Article.Header.Address = append(a.Body.Article.Header.Address, address{
 		A:    alink{Text: name, Href: link},
 		Text: description,
 	})
 }
 
 // SetPublish sets published date.
-func (ia *Article) SetPublish(date time.Time) {
+func (a *Article) SetPublish(date time.Time) {
 	// <time class="op-published" datetime="2014-11-11T04:44:16Z">November 11th, 4:44 PM</time>
-	ia.Body.Article.Header.Time = append(ia.Body.Article.Header.Time, Time{
+	a.Body.Article.Header.Time = append(a.Body.Article.Header.Time, Time{
 		Class:    "op-published",
 		Datetime: date.Format("2006-01-02T15:04:05Z"),
 		Text:     date.Format("2006-01-02 15:04:05"),
@@ -321,9 +321,9 @@ func (ia *Article) SetPublish(date time.Time) {
 }
 
 // SetModified sets modified date if article has been modified.
-func (ia *Article) SetModified(date time.Time) {
+func (a *Article) SetModified(date time.Time) {
 	// <time class="op-modified" dateTime="2014-12-11T04:44:16Z">December 11th, 4:44 PM</time>
-	ia.Body.Article.Header.Time = append(ia.Body.Article.Header.Time, Time{
+	a.Body.Article.Header.Time = append(a.Body.Article.Header.Time, Time{
 		Class:    "op-modified",
 		Datetime: date.Format("2006-01-02T15:04:05Z"),
 		Text:     date.Format("2006-01-02 15:04:05"),
@@ -332,9 +332,9 @@ func (ia *Article) SetModified(date time.Time) {
 
 // SetCoverImage of instant article.
 // Caption can be empty string.
-func (ia *Article) SetCoverImage(url, caption string) {
+func (a *Article) SetCoverImage(url, caption string) {
 	if url != "" {
-		ia.Body.Article.Header.Figure = append(ia.Body.Article.Header.Figure, &Figure{
+		a.Body.Article.Header.Figure = append(a.Body.Article.Header.Figure, &Figure{
 			Img:        &Img{Src: url},
 			Figcaption: caption,
 		})
@@ -344,9 +344,9 @@ func (ia *Article) SetCoverImage(url, caption string) {
 // SetCoverVideo of instant article.
 // videoType in format video/mp4 See the list of supported formats here https://www.facebook.com/help/218673814818907
 // Caption can be empty string.
-func (ia *Article) SetCoverVideo(url, videoType, caption string) {
+func (a *Article) SetCoverVideo(url, videoType, caption string) {
 	if url != "" {
-		ia.Body.Article.Header.Figure = append(ia.Body.Article.Header.Figure, &Figure{
+		a.Body.Article.Header.Figure = append(a.Body.Article.Header.Figure, &Figure{
 			Video: &Video{
 				Source: source{
 					Src:  url,
@@ -360,75 +360,75 @@ func (ia *Article) SetCoverVideo(url, videoType, caption string) {
 
 // SetFooter sets text in footer
 // You can use <p> in credits
-func (ia *Article) SetFooter(credits, copyright string) {
-	ia.Body.Article.Footer.Aside = credits
-	ia.Body.Article.Footer.Small = copyright
+func (a *Article) SetFooter(credits, copyright string) {
+	a.Body.Article.Footer.Aside = credits
+	a.Body.Article.Footer.Small = copyright
 }
 
 // SetTrackerCode for 3rd party analytics (Google Analytics for example)
 // Visit https://developers.facebook.com/docs/instant-articles/reference/analytics for more info.
-func (ia *Article) SetTrackerCode(code string) {
+func (a *Article) SetTrackerCode(code string) {
 	f := &Figure{
 		Class: "op-tracker",
 		IFrame: &IFrame{
 			Text: code,
 		},
 	}
-	ia.Body.Article.Elements = append(ia.Body.Article.Elements, element{Figure: f})
+	a.Body.Article.Elements = append(a.Body.Article.Elements, element{Figure: f})
 }
 
 // SetTrackerURL for 3rd party analytics that can be included with url.
 // Visit https://developers.facebook.com/docs/instant-articles/reference/analytics for more info.
-func (ia *Article) SetTrackerURL(url string) {
+func (a *Article) SetTrackerURL(url string) {
 	f := &Figure{
 		Class: "op-tracker",
 		IFrame: &IFrame{
 			Src: url,
 		},
 	}
-	ia.Body.Article.Elements = append(ia.Body.Article.Elements, element{Figure: f})
+	a.Body.Article.Elements = append(a.Body.Article.Elements, element{Figure: f})
 }
 
 // switchAutomaticAd positioning by Facebook and choose to manually position ads in article content
-func (ia *Article) switchAutomaticAd(on bool) {
-	ia.Head.Meta = append(ia.Head.Meta, Meta{
+func (a *Article) switchAutomaticAd(on bool) {
+	a.Head.Meta = append(a.Head.Meta, Meta{
 		Property: "fb:use_automatic_ad_placement",
 		Content:  strconv.FormatBool(on),
 	})
 }
 
 // SetAutomaticAd in header that Facebook will place automatically in article
-func (ia *Article) SetAutomaticAd(src string, width, height int, style, code string) {
+func (a *Article) SetAutomaticAd(src string, width, height int, style, code string) {
 	f := adFigure(src, width, height, style, code)
-	ia.Body.Article.Header.Figure = append(ia.Body.Article.Header.Figure, f)
-	ia.switchAutomaticAd(true)
+	a.Body.Article.Header.Figure = append(a.Body.Article.Header.Figure, f)
+	a.switchAutomaticAd(true)
 }
 
 // InsertAd manually on position between paragraphs.
-func (ia *Article) InsertAd(position int, src string, width, height int, style, code string) {
-	ia.InsertFigure(position, adFigure(src, width, height, style, code))
-	ia.switchAutomaticAd(false)
+func (a *Article) InsertAd(position int, src string, width, height int, style, code string) {
+	a.InsertFigure(position, adFigure(src, width, height, style, code))
+	a.switchAutomaticAd(false)
 }
 
 // AddAd manually in article content.
-func (ia *Article) AddAd(position int, src string, width, height int, style, code string) {
+func (a *Article) AddAd(position int, src string, width, height int, style, code string) {
 	f := adFigure(src, width, height, style, code)
-	ia.switchAutomaticAd(false)
-	ia.AddFigure(f)
+	a.switchAutomaticAd(false)
+	a.AddFigure(f)
 }
 
 // AddFigure to article content
-func (ia *Article) AddFigure(f *Figure) {
-	ia.Body.Article.Elements = append(ia.Body.Article.Elements, element{Figure: f})
+func (a *Article) AddFigure(f *Figure) {
+	a.Body.Article.Elements = append(a.Body.Article.Elements, element{Figure: f})
 }
 
 // InsertFigure in content on specified position within existing elements (paragraphs)
-func (ia *Article) InsertFigure(position int, f *Figure) {
+func (a *Article) InsertFigure(position int, f *Figure) {
 	e := element{Figure: f}
-	if position >= len(ia.Body.Article.Elements) {
-		position = len(ia.Body.Article.Elements)
+	if position >= len(a.Body.Article.Elements) {
+		position = len(a.Body.Article.Elements)
 	}
-	ia.Body.Article.Elements = append(ia.Body.Article.Elements[:position], append([]element{e}, ia.Body.Article.Elements[position:]...)...)
+	a.Body.Article.Elements = append(a.Body.Article.Elements[:position], append([]element{e}, a.Body.Article.Elements[position:]...)...)
 }
 
 // adFigre create figure with ad
