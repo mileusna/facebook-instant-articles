@@ -444,3 +444,8 @@ func adFigure(src string, width, height int, style, code string) *Figure {
 		},
 	}
 }
+
+// HTML is synonym for xml.Marshal(a)
+func (a Article) HTML() ([]byte, error) {
+	return xml.Marshal(a)
+}

@@ -144,3 +144,8 @@ func (f Feed) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name.Local = "rss" // rename root element from Article to html
 	return e.EncodeElement(feed, start)
 }
+
+// RSS is synonym for xml.Marshal(f)
+func (f Feed) RSS() ([]byte, error) {
+	return xml.Marshal(f)
+}
