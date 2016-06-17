@@ -89,7 +89,6 @@ Example:
         if err != nil {
             return
         }
-
         w.Write(feed)
     }
 */
