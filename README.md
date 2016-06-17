@@ -95,12 +95,12 @@ func handleInstantArticles(w http.ResponseWriter, r *http.Request) {
 	a.SetContent("<p>Pragraph 1</p><p>paragraph 2</p>")
 	f.AddArticleWithGUID(a, "12333") // add article and use for example mysql id as GUID
 
-	feed, err := xml.Marshal(f)
-	// html, err := f.RSS() // synonym for xml.Marshal
-	if err != nil {
+	rss, err := xml.Marshal(f)
+	// rss, err := f.RSS() // synonym for xml.Marshal
+	if rss != nil {
 		return
 	}
-	w.Write(feed)
+	w.Write(rss)
 }
 ```
 
