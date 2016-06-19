@@ -93,11 +93,14 @@ func (f *Feed) addArticle(a Article, guid string) error {
 	}
 
 	// if no subtitle, set first para as description
-	if i.Description == "" && a.Body.Article.Elements != nil {
-		for _, e := range a.Body.Article.Elements {
-			if e.P != "" {
-				i.Description = e.P
-				break
+	if i.Description == "" && a.Body.Article.Content != nil {
+		for _, ifc := range a.Body.Article.Content {
+			switch ifc.(type) {
+			case P:
+				if ifc.(P).Text != "" {
+					i.Description = string(ifc.(P).Text)
+					break
+				}
 			}
 		}
 	}

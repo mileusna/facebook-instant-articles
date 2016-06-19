@@ -32,15 +32,32 @@ type body struct {
 	Article article `xml:"article"`
 }
 
-type element struct {
-	P      string  `xml:",innerxml"`
-	Figure *Figure `xml:"figure,omitempty"`
+type article struct {
+	Header  header  `xml:"header"`
+	Content Content `xml:" ,"`
+	Footer  footer  `xml:"footer"`
 }
 
-type article struct {
-	Header   header    `xml:"header"`
-	Elements []element `xml:" ,"`
-	Footer   footer    `xml:"footer"`
+// ContentTag interface for supported tag elements in Facebook Article Content
+type ContentTag interface {
+	StartElement() xml.StartElement
+}
+
+// Content of Facebook Instant Article, currently support <p> and <figure>
+type Content []ContentTag
+
+// P HTML <p>
+type P struct {
+	Text string `xml:",innerxml"`
+}
+
+// Figure HTML <figure>
+type Figure struct {
+	Img        *Img    `xml:"img,omitempty"`
+	IFrame     *IFrame `xml:"iframe,omitempty"`
+	Video      *Video  `xml:"video,omitempty"`
+	Figcaption string  `xml:"figcaption,omitempty"`
+	Class      string  `xml:"class,attr,omitempty"`
 }
 
 // Header represents instant article header
@@ -65,21 +82,12 @@ type link struct {
 	Rel  string `xml:"rel,attr,omitempty"`
 }
 
-// Figure stuct
-type Figure struct {
-	Img        *Img    `xml:"img,omitempty"`
-	IFrame     *IFrame `xml:"iframe,omitempty"`
-	Video      *Video  `xml:"video,omitempty"`
-	Figcaption string  `xml:"figcaption,omitempty"`
-	Class      string  `xml:"class,attr,omitempty"`
-}
-
 // Video for article
 type Video struct {
 	Source source `xml:"source"`
 }
 
-// video source struct
+// source video struct
 type source struct {
 	Src  string `xml:"src,attr"`
 	Type string `xml:"type,attr"`
@@ -168,18 +176,23 @@ func (a Article) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(html, start)
 }
 
+// StartElement for ContentElement interface
+func (p P) StartElement() xml.StartElement {
+	return xml.StartElement{Name: xml.Name{Local: "p"}}
+}
+
+// StartElement for ContentElement interface
+func (f Figure) StartElement() xml.StartElement {
+	return xml.StartElement{Name: xml.Name{Local: "figure"}}
+}
+
 // MarshalXML for elements in body article content
-func (el *element) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	switch {
-	case el.P != "":
-		p := struct {
-			S string `xml:",innerxml"`
-		}{S: el.P}
-		start.Name.Local = "p"
-		return e.EncodeElement(p, start)
-	case el.Figure != nil:
-		start.Name.Local = "figure"
-		return e.EncodeElement(el.Figure, start)
+func (c Content) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	for _, i := range c {
+		err := e.EncodeElement(i, i.StartElement())
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -286,8 +299,8 @@ func (a *Article) SetContent(html string) {
 				m = strings.TrimSuffix(m, "</p>")
 				a.AddParagraph(m)
 			case strings.HasPrefix(m, "<figure"):
-				f := &Figure{}
-				xml.Unmarshal([]byte(m), f)
+				f := Figure{}
+				xml.Unmarshal([]byte(m), &f)
 				a.AddFigure(f)
 			}
 		}
@@ -298,7 +311,7 @@ func (a *Article) SetContent(html string) {
 
 // AddParagraph to Instant Article.
 func (a *Article) AddParagraph(html string) {
-	a.Body.Article.Elements = append(a.Body.Article.Elements, element{P: html})
+	a.Body.Article.Content = append(a.Body.Article.Content, P{Text: html})
 }
 
 // AddAuthor adds article author.
@@ -374,19 +387,19 @@ func (a *Article) SetTrackerCode(code string) {
 			Text: code,
 		},
 	}
-	a.Body.Article.Elements = append(a.Body.Article.Elements, element{Figure: f})
+	a.Body.Article.Content = append(a.Body.Article.Content, f)
 }
 
 // SetTrackerURL for 3rd party analytics that can be included with url.
 // Visit https://developers.facebook.com/docs/instant-articles/reference/analytics for more info.
 func (a *Article) SetTrackerURL(url string) {
-	f := &Figure{
+	f := Figure{
 		Class: "op-tracker",
 		IFrame: &IFrame{
 			Src: url,
 		},
 	}
-	a.Body.Article.Elements = append(a.Body.Article.Elements, element{Figure: f})
+	a.Body.Article.Content = append(a.Body.Article.Content, f)
 }
 
 // switchAutomaticAd positioning by Facebook and choose to manually position ads in article content
@@ -400,7 +413,7 @@ func (a *Article) switchAutomaticAd(on bool) {
 // SetAutomaticAd in header that Facebook will place automatically in article
 func (a *Article) SetAutomaticAd(src string, width, height int, style, code string) {
 	f := adFigure(src, width, height, style, code)
-	a.Body.Article.Header.Figure = append(a.Body.Article.Header.Figure, f)
+	a.Body.Article.Header.Figure = append(a.Body.Article.Header.Figure, &f)
 	a.switchAutomaticAd(true)
 }
 
@@ -418,22 +431,22 @@ func (a *Article) AddAd(position int, src string, width, height int, style, code
 }
 
 // AddFigure to article content
-func (a *Article) AddFigure(f *Figure) {
-	a.Body.Article.Elements = append(a.Body.Article.Elements, element{Figure: f})
+func (a *Article) AddFigure(f Figure) {
+	a.Body.Article.Content = append(a.Body.Article.Content, f)
 }
 
 // InsertFigure in content on specified position within existing elements (paragraphs)
-func (a *Article) InsertFigure(position int, f *Figure) {
-	e := element{Figure: f}
-	if position >= len(a.Body.Article.Elements) {
-		position = len(a.Body.Article.Elements)
+func (a *Article) InsertFigure(position int, f Figure) {
+	//e := element{Figure: f}
+	if position >= len(a.Body.Article.Content) {
+		position = len(a.Body.Article.Content)
 	}
-	a.Body.Article.Elements = append(a.Body.Article.Elements[:position], append([]element{e}, a.Body.Article.Elements[position:]...)...)
+	a.Body.Article.Content = append(a.Body.Article.Content[:position], append(Content{f}, a.Body.Article.Content[position:]...)...)
 }
 
 // adFigre create figure with ad
-func adFigure(src string, width, height int, style, code string) *Figure {
-	return &Figure{
+func adFigure(src string, width, height int, style, code string) Figure {
+	return Figure{
 		Class: "op-ad",
 		IFrame: &IFrame{
 			Width:  strconv.Itoa(width),

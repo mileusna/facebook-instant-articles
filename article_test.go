@@ -2,7 +2,6 @@ package instant_test
 
 import (
 	"encoding/xml"
-	"fmt"
 	"testing"
 	"time"
 
@@ -36,19 +35,15 @@ func TestArticle(t *testing.T) {
 		ga('send', 'pageview');
 	</script>`)
 
-	// <figure class="op-ad">
-	//   <iframe width="320" height="50" style="border:0; margin:0;" src="https://www.facebook.com/adnw_request?placement=141956036215488_141956099548815&adtype=banner320x50"></iframe>
-	// </figure>
-
-	a.SetContent("<p>Plain text</p><figure><iframe>a = 0;</iframe></figure><p>Plain <b>text</b><p>Plain text 22</p>")
+	a.SetContent("<p>Plain text</p><figure><iframe>a = 0;</iframe></figure><p>Plain <b>text</b></p><p>Plain text 22</p>")
 	a.AddParagraph("End <strong>The</strong>")
 	a.SetAutomaticAd("https://www.facebook.com/adnw_request?placement=141956036215488_141956099548815&adtype=banner320x50", 320, 50, "border:0; margin:0;", "")
 	//a.InsertAd(7, "https://www.facebook.com/adnw_request?placement=141956036215488_141956099548815&adtype=banner320x50", 320, 50, "border:0; margin:0;", "")
 
-	content, err := xml.MarshalIndent(a, "", "    ")
+	_, err := xml.MarshalIndent(a, "", "    ")
 	if err != nil {
 		t.Error(err)
 	}
 
-	fmt.Println(string(content))
+	//fmt.Println(string(content))
 }
