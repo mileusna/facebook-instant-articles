@@ -45,7 +45,7 @@ func main() {
 }
 ```
 
-##Feed
+## Feed
 
 Struct instant.Feed represents Facebook instant article RSS feed as described on
 https://developers.facebook.com/docs/instant-articles/publishing/setup-rss-feed
@@ -98,10 +98,10 @@ func handleInstantArticles(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-##Documentation
+## Documentation
 
 https://godoc.org/github.com/mileusna/facebook-instant-articles
 
-##License
+## License
 
 [MIT](LICENSE)
